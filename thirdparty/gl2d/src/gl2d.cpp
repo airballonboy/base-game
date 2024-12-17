@@ -66,6 +66,7 @@
 //	
 //
 
+#include "glad/glad.h"
 #include <gl2d/gl2d.h>
 
 #ifdef _WIN32
@@ -431,11 +432,12 @@ namespace gl2d
 			glGenTextures(1, &texture.id);
 			glBindTexture(GL_TEXTURE_2D, texture.id);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, fontRgbaBuffer);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glGenerateMipmap(GL_TEXTURE_2D);
 		}
 
 		delete[] fontMonochromeBuffer;
@@ -1762,7 +1764,7 @@ namespace gl2d
 	}
 
 	void Texture::createFromBuffer(const char* image_data, const int width, const int height
-		,bool pixelated, bool useMipMaps)
+		,bool minPixelated, bool magPixelated, bool useMipMaps)
 	{
 		GLuint id = 0;
 
@@ -1771,29 +1773,31 @@ namespace gl2d
 		glGenTextures(1, &id);
 		glBindTexture(GL_TEXTURE_2D, id);
 
-		if (pixelated)
+		if (minPixelated)
 		{
-			if (useMipMaps)
-			{
+			if (useMipMaps) {
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-			}
-			else 
-			{
+			} else {
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			}
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		}
+            if (magPixelated) {
+			    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		    } else {
+			    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            }
+        }
 		else 
 		{
-			if (useMipMaps)
-			{
+			if (useMipMaps) {
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			}
-			else
-			{
+	        } else {
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			}
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            }
+            if (magPixelated) {
+			    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		    } else {
+			    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            }
 		}
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -1828,7 +1832,7 @@ namespace gl2d
 	}
 
 	void Texture::createFromFileData(const unsigned char* image_file_data, const size_t image_file_size
-		,bool pixelated, bool useMipMaps)
+		,bool minPixelated, bool magPixelated, bool useMipMaps)
 	{
 		stbi_set_flip_vertically_on_load(true);
 
@@ -1838,13 +1842,13 @@ namespace gl2d
 
 		const unsigned char* decodedImage = stbi_load_from_memory(image_file_data, (int)image_file_size, &width, &height, &channels, 4);
 
-		createFromBuffer((const char*)decodedImage, width, height, pixelated, useMipMaps);
+		createFromBuffer((const char*)decodedImage, width, height, minPixelated, magPixelated, useMipMaps);
 
 		STBI_FREE(decodedImage);
 	}
 
 	void Texture::createFromFileDataWithPixelPadding(const unsigned char* image_file_data, const size_t image_file_size, int blockSize,
-		bool pixelated, bool useMipMaps)
+		bool minPixelated, bool magPixelated, bool useMipMaps)
 	{
 		stbi_set_flip_vertically_on_load(true);
 
@@ -1980,13 +1984,13 @@ namespace gl2d
 
 		}
 
-		createFromBuffer((const char*)newData, newW, newH, pixelated, useMipMaps);
+		createFromBuffer((const char*)newData, newW, newH, minPixelated, magPixelated, useMipMaps);
 
 		STBI_FREE(decodedImage);
 		delete[] newData;
 	}
 
-	void Texture::loadFromFile(const char* fileName, bool pixelated, bool useMipMaps)
+	void Texture::loadFromFile(const char* fileName, bool minPixelated, bool magPixelated, bool useMipMaps)
 	{
 		std::ifstream file(fileName, std::ios::binary);
 
@@ -2007,14 +2011,14 @@ namespace gl2d
 		file.read((char*)fileData, fileSize);
 		file.close();
 
-		createFromFileData(fileData, fileSize, pixelated, useMipMaps);
+		createFromFileData(fileData, fileSize, minPixelated, magPixelated, useMipMaps);
 
 		delete[] fileData;
 
 	}
 
 	void Texture::loadFromFileWithPixelPadding(const char* fileName, int blockSize,
-		bool pixelated, bool useMipMaps)
+		bool minPixelated, bool magPixelated, bool useMipMaps)
 	{
 		std::ifstream file(fileName, std::ios::binary);
 
@@ -2035,7 +2039,7 @@ namespace gl2d
 		file.read((char*)fileData, fileSize);
 		file.close();
 
-		createFromFileDataWithPixelPadding(fileData, fileSize, blockSize, pixelated, useMipMaps);
+		createFromFileDataWithPixelPadding(fileData, fileSize, blockSize, minPixelated, magPixelated, useMipMaps);
 
 		delete[] fileData;
 

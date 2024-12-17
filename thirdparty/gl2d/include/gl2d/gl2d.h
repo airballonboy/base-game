@@ -148,14 +148,16 @@ namespace gl2d
 		glm::ivec2 GetSize();
 
 		//Note: This function expects a buffer of bytes in GL_RGBA format
-		void createFromBuffer(const char* image_data, const int width,
-			const int height, bool pixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED, bool useMipMaps = GL2D_DEFAULT_TEXTURE_LOAD_MODE_USE_MIPMAPS);
+		void createFromBuffer(const char* image_data, const int width, const int height,
+			bool minPixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED, bool magPixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED,
+            bool useMipMaps = GL2D_DEFAULT_TEXTURE_LOAD_MODE_USE_MIPMAPS);
 		
 		//used internally. It creates a 1by1 white texture
 		void create1PxSquare(const char* b = 0);
 		
 		void createFromFileData(const unsigned char* image_file_data, const size_t image_file_size, 
-			bool pixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED, bool useMipMaps = GL2D_DEFAULT_TEXTURE_LOAD_MODE_USE_MIPMAPS);
+			bool minPixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED, bool magPixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED,
+		    bool useMipMaps = GL2D_DEFAULT_TEXTURE_LOAD_MODE_USE_MIPMAPS);
 
 		//For texture atlases.
 		//Adds a pixel padding between sprites elements to avoid some visual bugs.
@@ -163,17 +165,20 @@ namespace gl2d
 		//To be used with texture atlas padding to get the texture coordonates.
 		void createFromFileDataWithPixelPadding(const unsigned char* image_file_data,
 			const size_t image_file_size, int blockSize,
-			bool pixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED, bool useMipMaps = GL2D_DEFAULT_TEXTURE_LOAD_MODE_USE_MIPMAPS);
+			bool minPixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED, bool magPixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED,
+			bool useMipMaps = GL2D_DEFAULT_TEXTURE_LOAD_MODE_USE_MIPMAPS);
 
 		void loadFromFile(const char* fileName,
-			bool pixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED, bool useMipMaps = GL2D_DEFAULT_TEXTURE_LOAD_MODE_USE_MIPMAPS);
+			bool minPixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED, bool magPixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED,
+                    bool useMipMaps = GL2D_DEFAULT_TEXTURE_LOAD_MODE_USE_MIPMAPS);
 
 		//For texture atlases.
 		//Adds a pixel padding between sprites elements to avoid some visual bugs.
 		//Block size is the size of a block in pixels.
 		//To be used with texture atlas padding to get the texture coordonates.
 		void loadFromFileWithPixelPadding(const char* fileName, int blockSize,
-			bool pixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED, bool useMipMaps = GL2D_DEFAULT_TEXTURE_LOAD_MODE_USE_MIPMAPS);
+			bool minPixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED, bool magPixelated = GL2D_DEFAULT_TEXTURE_LOAD_MODE_PIXELATED,
+                    bool useMipMaps = GL2D_DEFAULT_TEXTURE_LOAD_MODE_USE_MIPMAPS);
 
 		void bind(const unsigned int sample = 0);
 		void unbind();

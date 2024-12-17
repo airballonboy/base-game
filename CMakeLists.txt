@@ -23,7 +23,7 @@ endif()
 # set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDebug$<$<CONFIG:Debug>:Debug>")
 # set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
 
-project(spaceGame)
+project(baseGame)
 
 set(GLFW_BUILD_DOCS
     OFF
