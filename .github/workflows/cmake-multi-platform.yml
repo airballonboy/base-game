@@ -47,6 +47,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+
+    - name: update
+      id: update
+      shell: bash
+      run: sudo apt-file update
+
     - name: fix errors
       id: fix
       shell: bash
