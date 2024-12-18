@@ -62,7 +62,7 @@ jobs:
     - name: fix errors2
       id: fix2
       shell: bash
-      run: sudo apt-get install libmesa-dev
+      run: sudo apt install mesa-common-dev
       
      
 
