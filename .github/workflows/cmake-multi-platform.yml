@@ -50,7 +50,7 @@ jobs:
     - name: fix errors
       id: fix
       shell: bash
-      run: sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev | sudo apt-get installlibmesa-dev
+      run: sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev sudo apt-get installlibmesa-dev
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
