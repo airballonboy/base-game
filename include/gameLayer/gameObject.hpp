@@ -1,4 +1,5 @@
 #pragma once
+#include "textureLoader.hpp"
 #include <gl2d/gl2d.h>
 #include <vector>
 
@@ -12,10 +13,26 @@
 class gameObject {
 private:
 
-	int32_t id;
+	size_t id;
 
 	gl2d::Texture objectTexture;
 	gl2d::TextureAtlasPadding objectAtlas;
+    bool rendered;
+	textureLoader::textureCTX currentTextureCTX;
+    
+    struct renderLayer{
+        std::string name = "default";
+        int order = 10;
+    };
+    static std::vector<renderLayer> layer;
+    renderLayer currentLayer;
+
+	struct renderOrderStruct{
+		int order = 0;
+		size_t goId;
+	};
+	static std::vector<renderOrderStruct> renderOrder;
+
 
     float baseGravity = 9.8;
 	float rotation = 0;
@@ -27,29 +44,36 @@ private:
 	glm::vec2 pivot = { dim.x / 2, dim.y / 2 };
 	glm::vec2 enemyViewDirection = { 1,0 };
 	bool enableGravity = false;
-    bool enableCollision = false;
 
 public:
+    //Variables
     static std::vector<gameObject> gameObjects; // Declaration
 	enum objectType { bullet, background, entity, staticEntity };
 	enum textureType { normal, atlas };
 	textureType currentTextureType;
 	objectType currentType;
 	glm::vec2 currentTextureCoords;
+    bool erased = false;
+
+    //functions
 	gameObject(objectType, const char*, textureType = normal, glm::vec2 = { 1, 1 }, glm::vec2 = { 0, 0 }, int = 128);
     gameObject();
-    virtual ~gameObject();
 	void update(float, gl2d::Renderer2D&);
-	static void update2(float, gl2d::Renderer2D&, gameObject*);
+	static void updateByRef(float, gl2d::Renderer2D&, gameObject*);
 	static void updateAll(float, gl2d::Renderer2D&);
-	void gravity();
-    bool checkColission(gameObject);
-    static void printObjectState(gameObject*);
+    static void printObjectState(int);
 	static int getObjectCount();
-	int getId();
-	bool isTheSameObject(gameObject);
+	void gravity();
 	void move(float);
+	bool isTheSameObject(gameObject);
+	static void tempReload();
 
+    struct colliderStruct{
+        bool collided = false;
+        gameObject* collidedWith;
+        bool enableCollision = false;
+        static void checkColission();
+    }collider2d;
 
 
 	//Setters 
@@ -67,6 +91,7 @@ public:
 
 
     //Getters
+	int getId();
     glm::vec2 getAcc();
     glm::vec2 getVel();
     glm::vec2 getPos();
@@ -79,16 +104,13 @@ public:
     float getRotation();
     float getTurningSpeed();
 
-   
+
+
+    static void newLayer(std::string, int);
+    static void addToLayer(gameObject*, std::string);
+  	static bool check(std::string, std::vector<renderLayer>*);
+ 
 
 
 };
-class loadOnceClass {
-public:
-	std::vector<const char*> loadedTexturesNames;
-	std::vector<gl2d::Texture> loadedTextures;
-	std::vector<gl2d::TextureAtlasPadding> loadedTextureAtlases;
 
-	int checkTextures(const char*, bool, bool = false, bool = true, bool = true, int = 128, glm::vec2 = { 0, 0 });
-
-};
